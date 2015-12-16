@@ -20,6 +20,7 @@ package com.hippo.acbattery;
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -38,7 +39,6 @@ public class UpdateService extends IntentService {
     public static final String ACTION_BATTERY_LOW = "com.hippo.battery.action.BATTERY_LOW";
     public static final String ACTION_BATTERY_OKAY = "com.hippo.battery.action.BATTERY_OKAY";
     public static final String ACTION_WIDGET_UPDATE = "com.hippo.battery.action.WIDGET_UPDATE";
-    public static final String ACTION_UPDATE = "com.hippo.battery.action.UPDATE";
 
     public static final String EXTRA_WIDGET_IDS = "com.hippo.battery.extra.WIDGET_IDS";
 
@@ -49,7 +49,7 @@ public class UpdateService extends IntentService {
     private Paint mTextPaint;
     private Rect mRect;
 
-    private boolean mInit = false;
+    private boolean mInitPaintSize = false;
 
     public UpdateService() {
         super("UpdateService");
@@ -77,12 +77,12 @@ public class UpdateService extends IntentService {
         final String action = intent.getAction();
         if (ACTION_BATTERY_CHANGED.equals(action)) {
             // Save battery info
-            BatteryInfo newBatteryInfo = new BatteryInfo(intent);
+            BatteryInfo batteryInfo = new BatteryInfo(intent);
             SharedPreferences sharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(this);
-            newBatteryInfo.saveToSharedPreferences(sharedPreferences);
+            batteryInfo.saveToSharedPreferences(sharedPreferences);
             // Update widget
-            RemoteViews remoteViews = createRemoteViews(newBatteryInfo);
+            RemoteViews remoteViews = createRemoteViews(this, batteryInfo);
             ComponentName componentName = new ComponentName(this, BatteryWidgetProvider.class);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
             appWidgetManager.updateAppWidget(componentName, remoteViews);
@@ -95,53 +95,49 @@ public class UpdateService extends IntentService {
             SharedPreferences sharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(this);
             BatteryInfo batteryInfo = new BatteryInfo(sharedPreferences);
-            RemoteViews remoteViews = createRemoteViews(batteryInfo);
+            RemoteViews remoteViews = createRemoteViews(this, batteryInfo);
             final int[] widgetIds = intent.getIntArrayExtra(EXTRA_WIDGET_IDS);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
             appWidgetManager.updateAppWidget(widgetIds, remoteViews);
-        } else if (ACTION_UPDATE.equals(action)) {
-            // Load battery info and update widget
-            SharedPreferences sharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-            BatteryInfo batteryInfo = new BatteryInfo(sharedPreferences);
-            RemoteViews remoteViews = createRemoteViews(batteryInfo);
-            ComponentName componentName = new ComponentName(this, BatteryWidgetProvider.class);
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-            appWidgetManager.updateAppWidget(componentName, remoteViews);
         }
     }
 
-    private Bitmap getStringBitmap(String str) {
-        if (!mInit) {
-            mInit = true;
-            mStrokePaint.setTextSize(Utils.dp2pix(this, TEXT_SIZE_DP));
-            mStrokePaint.setStrokeWidth(2 * Utils.dp2pix(this, TEXT_OUTLINE_DP));
-            mTextPaint.setTextSize(Utils.dp2pix(this, TEXT_SIZE_DP));
-        }
+    public static Bitmap createOutlineStringBitmap(Context context, String str,
+            Paint strokePaint, Paint textPaint, Rect tempRect) {
+        Rect rect = tempRect == null ? new Rect() : tempRect;
 
-        mStrokePaint.getTextBounds(str, 0, str.length(), mRect);
+        strokePaint.getTextBounds(str, 0, str.length(), rect);
 
-        int offset = Utils.dp2pix(this, TEXT_OUTLINE_DP);
+        int offset = Utils.dp2pix(context, TEXT_OUTLINE_DP);
         Bitmap bitmap = Bitmap.createBitmap(
-                mRect.width() + offset * 2, mRect.height() + offset * 2, Bitmap.Config.ARGB_8888);
+                rect.width() + offset * 2, rect.height() + offset * 2, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        canvas.drawText(str, -mRect.left + offset, -mRect.top + offset, mStrokePaint);
-        canvas.drawText(str, -mRect.left + offset, -mRect.top + offset, mTextPaint);
+        canvas.drawText(str, -rect.left + offset, -rect.top + offset, strokePaint);
+        canvas.drawText(str, -rect.left + offset, -rect.top + offset, textPaint);
 
         return bitmap;
     }
 
-    private RemoteViews createRemoteViews(BatteryInfo batteryInfo) {
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.battery_widget);
+    private RemoteViews createRemoteViews(Context context, BatteryInfo batteryInfo) {
+        if (!mInitPaintSize) {
+            mInitPaintSize = true;
+            mStrokePaint.setTextSize(Utils.dp2pix(context, TEXT_SIZE_DP));
+            mStrokePaint.setStrokeWidth(2 * Utils.dp2pix(context, TEXT_OUTLINE_DP));
+            mTextPaint.setTextSize(Utils.dp2pix(context, TEXT_SIZE_DP));
+        }
+
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.battery_widget);
         remoteViews.setImageViewBitmap(R.id.level,
-                getStringBitmap(Integer.toString(batteryInfo.getLevel()) + "%"));
+                createOutlineStringBitmap(context, Integer.toString(batteryInfo.getLevel()) + "%",
+                        mStrokePaint, mTextPaint, mRect));
         remoteViews.setImageViewBitmap(R.id.temperature,
-                getStringBitmap(Float.toString(batteryInfo.getTemperature() / 10.0f) + "℃"));
+                createOutlineStringBitmap(context, Float.toString(batteryInfo.getTemperature() / 10.0f) + "℃",
+                        mStrokePaint, mTextPaint, mRect));
 
         SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(this);
+                .getDefaultSharedPreferences(context);
         remoteViews.setImageViewResource(R.id.image,
                 new BatteryItems(sharedPreferences).getDrawableId(batteryInfo));
         return remoteViews;

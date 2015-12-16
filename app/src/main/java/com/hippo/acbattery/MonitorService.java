@@ -25,7 +25,7 @@ import android.os.IBinder;
 
 public class MonitorService extends Service {
 
-    final private BroadcastReceiver mMonitorReceiver = new MonitorReceiver();
+    private final BroadcastReceiver mMonitorReceiver = new MonitorReceiver();
 
     @Override
     public void onCreate() {

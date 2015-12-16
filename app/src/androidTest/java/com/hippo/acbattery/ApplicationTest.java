@@ -4,9 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.test.ApplicationTestCase;
@@ -30,21 +28,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public ApplicationTest() {
         super(Application.class);
-    }
-
-    private Bitmap getStringBitmap(String str, Paint strokePaint, Paint textPaint, Rect rect) {
-        strokePaint.getTextBounds(str, 0, str.length(), rect);
-
-        int offset = Utils.dp2pix(getContext(), TEXT_OUTLINE_DP);
-        Bitmap bitmap = Bitmap.createBitmap(
-                rect.width() + offset * 2, rect.height() + offset * 2, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-        canvas.drawText(str, -rect.left + offset, -rect.top + offset, strokePaint);
-        canvas.drawText(str, -rect.left + offset, -rect.top + offset, textPaint);
-
-        return bitmap;
     }
 
     public void testPreview() throws FileNotFoundException {
@@ -78,8 +61,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ImageView level = (ImageView) viewGroup.findViewById(R.id.level);
 
         image.setImageResource(R.drawable.ac16);
-        temperature.setImageBitmap(getStringBitmap("23.3℃", strokePaint, textPaint, rect));
-        level.setImageBitmap(getStringBitmap("100%", strokePaint, textPaint, rect));
+        temperature.setImageBitmap(UpdateService.createOutlineStringBitmap(
+                context, "23.3℃", strokePaint, textPaint, rect));
+        level.setImageBitmap(UpdateService.createOutlineStringBitmap(
+                context, "100%", strokePaint, textPaint, rect));
 
         viewGroup.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));

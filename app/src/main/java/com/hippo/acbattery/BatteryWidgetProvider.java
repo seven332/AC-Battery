@@ -26,14 +26,21 @@ import android.content.Intent;
 public class BatteryWidgetProvider extends AppWidgetProvider {
 
     /**
+     * @return null or int[]
+     */
+    public static int[] getWidgetIds(Context context) {
+        ComponentName componentName = new ComponentName(context, BatteryWidgetProvider.class);
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        return appWidgetManager.getAppWidgetIds(componentName);
+    }
+
+    /**
      * Get the number of widgets that have been enabled and placed on the home screen.
      *
      * @param context The application context.
      */
-    public static int getNumberOfWidgets(final Context context) {
-        ComponentName componentName = new ComponentName(context, BatteryWidgetProvider.class);
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        int[] activeWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+    public static int getNumberOfWidgets(Context context) {
+        int[] activeWidgetIds = getWidgetIds(context);
         return activeWidgetIds == null ? 0 : activeWidgetIds.length;
     }
 

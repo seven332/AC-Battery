@@ -25,10 +25,6 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        startMonitorService(context);
-    }
-
-    public static void startMonitorService(Context context) {
         if (BatteryWidgetProvider.getNumberOfWidgets(context) > 0) {
             // ensure service is running
             context.startService(new Intent(context, MonitorService.class));

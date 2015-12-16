@@ -17,6 +17,7 @@
 package com.hippo.acbattery;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -81,10 +82,12 @@ public final class SettingsActivity extends Activity implements View.OnClickList
         mOnBatteryAdd.setOnClickListener(this);
         mChargingAdd.setOnClickListener(this);
 
-        BootReceiver.startMonitorService(this);
-        Intent updateIntent = new Intent(this, UpdateService.class);
-        updateIntent.setAction(UpdateService.ACTION_UPDATE);
-        startService(updateIntent);
+        if (BatteryWidgetProvider.getNumberOfWidgets(this) > 0) {
+            // Ensure service is running
+            startService(new Intent(this, MonitorService.class));
+            // Notify update widget
+            notifyUpdateWidget();
+        }
     }
 
     private void updateLayout() {
@@ -242,8 +245,15 @@ public final class SettingsActivity extends Activity implements View.OnClickList
         mBatteryItems.saveToSharedPreferences(this, mSharedPreferences);
         updateLayout();
 
-        Intent updateIntent = new Intent(this, UpdateService.class);
-        updateIntent.setAction(UpdateService.ACTION_UPDATE);
-        startService(updateIntent);
+        // Notify update widget
+        notifyUpdateWidget();
+    }
+
+    private void notifyUpdateWidget() {
+        int[] ids = BatteryWidgetProvider.getWidgetIds(this);
+        Intent intent = new Intent(this, BatteryWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        sendBroadcast(intent);
     }
 }
