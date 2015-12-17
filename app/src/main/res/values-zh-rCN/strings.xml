@@ -19,12 +19,14 @@
     <string name="app_name">AC 电量</string>
 
     <string name="how_to_use">如何使用</string>
+    <string name="note">注意</string>
     <string name="on_battery">使用电池时</string>
     <string name="charging">充电时</string>
     <string name="about">关于</string>
 
-    <string name="how_to_use_text">AC 电量是一个显示电池电量的小部件。\n\n如果要使用本应用，你需要把“AC 电量”小部件添加至桌面。\n\n注意：如果本应用被强制关闭或者被内存清理工具杀死，小部件将无法正常工作。建议把本应用添加到内存清理工具的白名单里。</string>
-    <string name="about_text">开发者：&lt;a href=&quot;mailto:hipposeven332@gmail.com&quot;&gt;Hippo Seven&lt;/a&gt;&lt;br&gt;&lt;br&gt;本项目基于 er-mo 的 &lt;a href=&quot;https://github.com/er-mo/Android-Battery-Widget&quot;&gt;Android-Battery-Widget&lt;/a&gt;</string>
+    <string name="how_to_use_text">AC 电量是一个显示电池电量的小部件。\n\n如果要使用本应用，你需要把“AC 电量”小部件添加至桌面。</string>
+    <string name="note_text">如果本应用被强制关闭或者被内存清理工具杀死，小部件将无法正常工作。\n\n再次打开本窗口可以让小部件再次正常工作。\n\n点击小部件即可打开本窗口并让小部件再次正常工作！\n\n建议把本应用添加到内存清理工具的白名单里。</string>
+    <string name="about_text">开发者：&lt;a href=&quot;mailto:hipposeven332@gmail.com&quot;&gt;Hippo Seven&lt;/a&gt;&lt;br&gt;&lt;br&gt;Github：&lt;a href=&quot;https://github.com/seven332/AC-Battery&quot;&gt;https://github.com/seven332/AC-Battery&lt;/a&gt;&lt;br&gt;&lt;br&gt;本项目基于 er-mo 的 &lt;a href=&quot;https://github.com/er-mo/Android-Battery-Widget&quot;&gt;Android-Battery-Widget&lt;/a&gt;&lt;br&gt;&lt;br&gt;AC 娘表情为AcFun弹幕视频网所有</string>
 
     <string name="_default">默认</string>
     <string name="add">添加</string>

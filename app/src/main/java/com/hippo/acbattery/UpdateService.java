@@ -18,6 +18,7 @@
 package com.hippo.acbattery;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -135,6 +136,10 @@ public class UpdateService extends IntentService {
         remoteViews.setImageViewBitmap(R.id.temperature,
                 createOutlineStringBitmap(context, Float.toString(batteryInfo.getTemperature() / 10.0f) + "℃",
                         mStrokePaint, mTextPaint, mRect));
+
+        Intent activityIntent = new Intent(this, SettingsActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+        remoteViews.setOnClickPendingIntent(R.id.main, pendingIntent);
 
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
