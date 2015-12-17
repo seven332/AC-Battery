@@ -20,6 +20,7 @@ package com.hippo.acbattery;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.BatteryManager;
+import android.os.Build;
 
 public class BatteryInfo {
 
@@ -96,7 +97,11 @@ public class BatteryInfo {
         editor.putInt(EXTRA_VOLTAGE, mVoltage);
         editor.putInt(EXTRA_TEMPERATURE, mTemperature);
         editor.putString(EXTRA_TECHNOLOGY, mTechnology);
-        editor.apply();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            editor.apply();
+        } else {
+            editor.commit();
+        }
     }
 
     public int getStatus() {

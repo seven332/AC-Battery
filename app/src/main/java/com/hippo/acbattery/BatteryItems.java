@@ -18,6 +18,7 @@ package com.hippo.acbattery;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -158,7 +159,13 @@ public class BatteryItems {
             charging.put(KEY_BATTERIES, chargingArray);
             batteryItems.put(KEY_CHARGING, charging);
 
-            sharedPreferences.edit().putString(KEY_BATTERY_ITEMS, batteryItems.toString()).apply();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY_BATTERY_ITEMS, batteryItems.toString());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                editor.apply();
+            } else {
+                editor.commit();
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
