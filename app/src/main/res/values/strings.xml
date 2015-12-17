@@ -18,11 +18,13 @@
 
     <string name="app_name">AC Battery</string>
 
+    <string name="how_to_use">How to use</string>
     <string name="on_battery">On battery</string>
     <string name="charging">Charging</string>
     <string name="about">About</string>
 
-    <string name="about_text">Developer: &lt;a href=&quot;mailto:hipposeven332@gmail.com&quot;&gt;Hippo Seven&lt;/a&gt;&lt;br&gt;&lt;br&gt;The project is base on er-mo\'s &lt;a href=&quot;https://github.com/er-mo/Android-Battery-Widget&quot;&gt;Android-Battery-Widget&lt;/a&gt;.</string>
+    <string name="how_to_use_text">AC Battery is a widget to show battery level.\n\nTo use this app, you need to add a "AC battery" widget to the home screen.\n\nNote: If the app is force stopped or killed by memory cleaner, the widget will not work correctly. It is recommended to add the app to the white list of your memory cleaner.</string>
+    <string name="about_text">Developer: &lt;a href=&quot;mailto:hipposeven332@gmail.com&quot;&gt;Hippo Seven&lt;/a&gt;&lt;br&gt;&lt;br&gt;The project is base on er-mo\'s &lt;a href=&quot;https://github.com/er-mo/Android-Battery-Widget&quot;&gt;Android-Battery-Widget&lt;/a&gt;</string>
 
     <string name="_default">Default</string>
     <string name="add">Add</string>
