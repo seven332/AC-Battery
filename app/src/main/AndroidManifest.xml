@@ -46,7 +46,7 @@
         </receiver>
 
         <receiver
-            android:name="com.hippo.acbattery.BootReceiver"
+            android:name="com.hippo.acbattery.TriggerReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
