@@ -18,8 +18,10 @@ package com.hippo.acbattery;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -28,11 +30,14 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public final class SettingsActivity extends Activity implements View.OnClickListener {
+public final class SettingsActivity extends Activity
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private static final int TYPE_SHIFT = 28;
     private static final int TYPE_MASK  = 0xf << TYPE_SHIFT;
@@ -43,6 +48,8 @@ public final class SettingsActivity extends Activity implements View.OnClickList
     private static final int TYPE_CHARGING = 3 << TYPE_SHIFT;
     private static final int TYPE_CHARGING_DEFAULT = 4 << TYPE_SHIFT;
     private static final int TYPE_CHARGING_ADD = 5 << TYPE_SHIFT;
+
+    private CheckBox mHideLaunchIcon;
 
     private LinearLayout mOnBatteryDefault;
     private LinearLayout mOnBattery;
@@ -60,6 +67,8 @@ public final class SettingsActivity extends Activity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        mHideLaunchIcon = (CheckBox) findViewById(R.id.hide_launch_icon);
+
         mOnBatteryDefault = (LinearLayout) findViewById(R.id.on_battery_default);
         mOnBattery = (LinearLayout) findViewById(R.id.on_battery);
         mOnBatteryAdd = (LinearLayout) findViewById(R.id.on_battery_add);
@@ -67,6 +76,11 @@ public final class SettingsActivity extends Activity implements View.OnClickList
         mCharging = (LinearLayout) findViewById(R.id.charging);
         mChargingAdd = (LinearLayout) findViewById(R.id.charging_add);
         TextView about = (TextView) findViewById(R.id.about);
+
+        PackageManager p = getPackageManager();
+        ComponentName c = new ComponentName(this, "com.hippo.acbattery.SettingsActivity-Launcher");
+        mHideLaunchIcon.setChecked(p.getComponentEnabledSetting(c) ==
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mBatteryItems = new BatteryItems(mSharedPreferences);
@@ -77,6 +91,9 @@ public final class SettingsActivity extends Activity implements View.OnClickList
         about.setText(Html.fromHtml(getString(R.string.about_text)));
         about.setMovementMethod(LinkMovementMethod.getInstance());
 
+        mHideLaunchIcon.setOnCheckedChangeListener(this);
+
+        mHideLaunchIcon.setOnClickListener(this);
         mOnBatteryDefault.setOnClickListener(this);
         mChargingDefault.setOnClickListener(this);
         mOnBatteryAdd.setOnClickListener(this);
@@ -88,6 +105,16 @@ public final class SettingsActivity extends Activity implements View.OnClickList
             // Notify update widget
             notifyUpdateWidget();
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        PackageManager p = getPackageManager();
+        ComponentName c = new ComponentName(this, "com.hippo.acbattery.SettingsActivity-Launcher");
+        p.setComponentEnabledSetting(c,
+                isChecked ? PackageManager.COMPONENT_ENABLED_STATE_DISABLED :
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
     }
 
     private void updateLayout() {
