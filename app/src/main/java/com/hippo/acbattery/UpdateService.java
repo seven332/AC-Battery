@@ -134,7 +134,7 @@ public class UpdateService extends IntentService {
                 createOutlineStringBitmap(context, Integer.toString(batteryInfo.getLevel()) + "%",
                         mStrokePaint, mTextPaint, mRect));
         remoteViews.setImageViewBitmap(R.id.temperature,
-                createOutlineStringBitmap(context, Float.toString(batteryInfo.getTemperature() / 10.0f) + "℃",
+                createOutlineStringBitmap(context, Float.toString(batteryInfo.getTemperature() / 10.0f) + "\u2103",
                         mStrokePaint, mTextPaint, mRect));
 
         Intent activityIntent = new Intent(this, SettingsActivity.class);
