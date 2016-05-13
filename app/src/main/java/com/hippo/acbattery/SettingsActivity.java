@@ -126,14 +126,14 @@ public final class SettingsActivity extends Activity
         for (int i = 0, length = mBatteryItems.getOnBatterySize(); i < length; i++) {
             inflater.inflate(R.layout.item_battery, mOnBattery, true);
             LinearLayout view = (LinearLayout) mOnBattery.getChildAt(mOnBattery.getChildCount() - 1);
-            setBatteryItem(view, "≥ " + mBatteryItems.getOnBatteryLimit(i), mBatteryItems.getOnBatteryId(i));
+            setBatteryItem(view, "\u2265 " + mBatteryItems.getOnBatteryLimit(i), mBatteryItems.getOnBatteryId(i));
             view.setOnClickListener(this);
         }
         mCharging.removeAllViews();
         for (int i = 0, length = mBatteryItems.getChargingSize(); i < length; i++) {
             inflater.inflate(R.layout.item_battery, mCharging, true);
             LinearLayout view = (LinearLayout) mCharging.getChildAt(mCharging.getChildCount() - 1);
-            setBatteryItem(view, "≥ " + mBatteryItems.getChargingLimit(i), mBatteryItems.getChargingId(i));
+            setBatteryItem(view, "\u2265 " + mBatteryItems.getChargingLimit(i), mBatteryItems.getChargingId(i));
             view.setOnClickListener(this);
         }
     }
