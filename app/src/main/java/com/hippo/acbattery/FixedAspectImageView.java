@@ -20,14 +20,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 
-/**
- * aspect is width / height
- */
 public class FixedAspectImageView extends ImageView {
-
-    private static final String TAG = FixedAspectImageView.class.getSimpleName();
 
     private static final int[] MIN_ATTRS = {
             android.R.attr.minWidth,
@@ -46,19 +42,26 @@ public class FixedAspectImageView extends ImageView {
     private int mMaxHeight = Integer.MAX_VALUE;
     private boolean mAdjustViewBounds = false;
 
+    // width / height
     private float mAspect = -1f;
 
     public FixedAspectImageView(Context context) {
         super(context);
+        init(context, null, 0);
     }
 
     public FixedAspectImageView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        init(context, attrs, 0);
     }
 
     public FixedAspectImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init(context, attrs, defStyle);
+    }
 
+    @SuppressWarnings("ResourceType")
+    private void init(Context context, AttributeSet attrs, int defStyle) {
         TypedArray a;
 
         // Make sure we get value from xml
@@ -119,11 +122,14 @@ public class FixedAspectImageView extends ImageView {
     public void setAspect(float ratio) {
         if (ratio > 0) {
             mAspect = ratio;
-            setAdjustViewBounds(true);
         } else {
             mAspect = -1f;
         }
         requestLayout();
+    }
+
+    public float getAspect() {
+        return mAspect;
     }
 
     /**
@@ -138,21 +144,21 @@ public class FixedAspectImageView extends ImageView {
     private int resolveAdjustedSize(int desiredSize, int minSize, int maxSize,
             int measureSpec) {
         int result = desiredSize;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize =  MeasureSpec.getSize(measureSpec);
+        int specMode = View.MeasureSpec.getMode(measureSpec);
+        int specSize =  View.MeasureSpec.getSize(measureSpec);
         switch (specMode) {
-            case MeasureSpec.UNSPECIFIED:
+            case View.MeasureSpec.UNSPECIFIED:
                 // Parent says we can be as big as we want. Just don't be smaller
                 // than min size, and don't be larger than max size.
                 result = clamp(desiredSize, minSize, maxSize);
                 break;
-            case MeasureSpec.AT_MOST:
+            case View.MeasureSpec.AT_MOST:
                 // Parent says we can be as big as we want, up to specSize.
                 // Don't be larger than specSize, and don't be smaller
                 // than min size, and don't be larger than max size.
                 result = Math.min(clamp(desiredSize, minSize, maxSize), specSize);
                 break;
-            case MeasureSpec.EXACTLY:
+            case View.MeasureSpec.EXACTLY:
                 // No choice. Do what we are told.
                 result = specSize;
                 break;
@@ -161,19 +167,19 @@ public class FixedAspectImageView extends ImageView {
     }
 
     private boolean isSizeAcceptable(int size, int minSize, int maxSize, int measureSpec) {
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize =  MeasureSpec.getSize(measureSpec);
+        int specMode = View.MeasureSpec.getMode(measureSpec);
+        int specSize =  View.MeasureSpec.getSize(measureSpec);
         switch (specMode) {
-            case MeasureSpec.UNSPECIFIED:
+            case View.MeasureSpec.UNSPECIFIED:
                 // Parent says we can be as big as we want. Just don't be smaller
                 // than min size, and don't be larger than max size.
                 return size >= minSize && size <= maxSize;
-            case MeasureSpec.AT_MOST:
+            case View.MeasureSpec.AT_MOST:
                 // Parent says we can be as big as we want, up to specSize.
                 // Don't be larger than specSize, and don't be smaller
                 // than min size, and don't be larger than max size.
                 return size <= specSize && size >= minSize && size <= maxSize;
-            case MeasureSpec.EXACTLY:
+            case View.MeasureSpec.EXACTLY:
                 // No choice.
                 return size == specSize;
             default:
@@ -196,17 +202,18 @@ public class FixedAspectImageView extends ImageView {
         // We are allowed to change the view's height
         boolean resizeHeight = false;
 
-        final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-        final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+        final int widthSpecMode = View.MeasureSpec.getMode(widthMeasureSpec);
+        final int heightSpecMode = View.MeasureSpec.getMode(heightMeasureSpec);
 
         Drawable drawable = getDrawable();
         if (drawable == null) {
             // If no drawable, its intrinsic size is 0.
             w = h = 0;
 
-            if (mAdjustViewBounds && mAspect > 0.0f) {
-                resizeWidth = widthSpecMode != MeasureSpec.EXACTLY;
-                resizeHeight = heightSpecMode != MeasureSpec.EXACTLY;
+            // Aspect is forced set.
+            if (mAspect > 0.0f) {
+                resizeWidth = widthSpecMode != View.MeasureSpec.EXACTLY;
+                resizeHeight = heightSpecMode != View.MeasureSpec.EXACTLY;
                 desiredAspect = mAspect;
             }
         } else {
@@ -215,20 +222,24 @@ public class FixedAspectImageView extends ImageView {
             if (w <= 0) w = 1;
             if (h <= 0) h = 1;
 
-            // We are supposed to adjust view bounds to match the aspect
-            // ratio of our drawable. See if that is possible.
             if (mAdjustViewBounds) {
-                resizeWidth = widthSpecMode != MeasureSpec.EXACTLY;
-                resizeHeight = heightSpecMode != MeasureSpec.EXACTLY;
-
-                desiredAspect = mAspect <= 0.0f ? ((float) w / (float) h) : mAspect;
+                // We are supposed to adjust view bounds to match the aspect
+                // ratio of our drawable. See if that is possible.
+                resizeWidth = widthSpecMode != View.MeasureSpec.EXACTLY;
+                resizeHeight = heightSpecMode != View.MeasureSpec.EXACTLY;
+                desiredAspect = (float) w / (float) h;
+            } else if (mAspect > 0.0f) {
+                // Aspect is forced set.
+                resizeWidth = widthSpecMode != View.MeasureSpec.EXACTLY;
+                resizeHeight = heightSpecMode != View.MeasureSpec.EXACTLY;
+                desiredAspect = mAspect;
             }
         }
 
-        int pleft = getPaddingLeft();
-        int pright = getPaddingRight();
-        int ptop = getPaddingTop();
-        int pbottom = getPaddingBottom();
+        int pLeft = getPaddingLeft();
+        int pRight = getPaddingRight();
+        int pTop = getPaddingTop();
+        int pBottom = getPaddingBottom();
 
         int widthSize;
         int heightSize;
@@ -239,27 +250,27 @@ public class FixedAspectImageView extends ImageView {
             // least one dimension.
 
             // Get the max possible width given our constraints
-            widthSize = resolveAdjustedSize(w + pleft + pright, mMinWidth, mMaxWidth, widthMeasureSpec);
+            widthSize = resolveAdjustedSize(w + pLeft + pRight, mMinWidth, mMaxWidth, widthMeasureSpec);
 
             // Get the max possible height given our constraints
-            heightSize = resolveAdjustedSize(h + ptop + pbottom, mMinHeight, mMaxHeight, heightMeasureSpec);
+            heightSize = resolveAdjustedSize(h + pTop + pBottom, mMinHeight, mMaxHeight, heightMeasureSpec);
 
             if (desiredAspect != 0.0f) {
                 // See what our actual aspect ratio is
-                float actualAspect = (float)(widthSize - pleft - pright) /
-                                        (heightSize - ptop - pbottom);
+                float actualAspect = (float)(widthSize - pLeft - pRight) /
+                        (heightSize - pTop - pBottom);
 
                 if (Math.abs(actualAspect - desiredAspect) > 0.0000001) {
                     boolean done = false;
 
                     // Try adjusting width to be proportional to height
                     if (resizeWidth) {
-                        int newWidth = (int)(desiredAspect * (heightSize - ptop - pbottom)) +
-                                pleft + pright;
+                        int newWidth = (int)(desiredAspect * (heightSize - pTop - pBottom)) +
+                                pLeft + pRight;
 
                         // Allow the width to outgrow its original estimate if height is fixed.
                         //if (!resizeHeight) {
-                            //widthSize = resolveAdjustedSize(newWidth, mMinWidth, mMaxWidth, widthMeasureSpec);
+                        //widthSize = resolveAdjustedSize(newWidth, mMinWidth, mMaxWidth, widthMeasureSpec);
                         //}
 
                         if (isSizeAcceptable(newWidth, mMinWidth, mMaxWidth, widthMeasureSpec)) {
@@ -270,8 +281,8 @@ public class FixedAspectImageView extends ImageView {
 
                     // Try adjusting height to be proportional to width
                     if (!done && resizeHeight) {
-                        int newHeight = (int)((widthSize - pleft - pright) / desiredAspect) +
-                                ptop + pbottom;
+                        int newHeight = (int)((widthSize - pLeft - pRight) / desiredAspect) +
+                                pTop + pBottom;
 
                         // Allow the height to outgrow its original estimate if width is fixed.
                         if (!resizeWidth) {
@@ -289,8 +300,8 @@ public class FixedAspectImageView extends ImageView {
             // We are either don't want to preserve the drawables aspect ratio,
             // or we are not allowed to change view dimensions. Just measure in
             // the normal way.
-            w += pleft + pright;
-            h += ptop + pbottom;
+            w += pLeft + pRight;
+            h += pTop + pBottom;
 
             w = Math.max(w, getSuggestedMinimumWidth());
             h = Math.max(h, getSuggestedMinimumHeight());

@@ -25,7 +25,7 @@ import android.graphics.drawable.Drawable;
 
 public class DeleteDrawable extends Drawable {
 
-    private Paint mPaint;
+    private final Paint mPaint;
 
     public DeleteDrawable(int color) {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

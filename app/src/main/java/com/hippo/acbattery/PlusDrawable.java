@@ -26,8 +26,8 @@ import android.graphics.drawable.Drawable;
 
 public class PlusDrawable extends Drawable {
 
-    private Paint mPaint;
-    private RectF mRectF;
+    private final Paint mPaint;
+    private final RectF mRectF;
 
     public PlusDrawable(int color) {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

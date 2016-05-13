@@ -49,11 +49,11 @@ public class BatteryItems {
     private int mOnBatteryDefaultId = DEFAULT_ON_BATTERY_DEFAULT_ID;
     private int mChargingDefaultId = DEFAULT_CHARGING_DEFAULT_ID;
 
-    private List<Integer> mOnBatteryLimitList = new ArrayList<>();
-    private List<Integer> mOnBatteryIdList = new ArrayList<>();
+    private final List<Integer> mOnBatteryLimitList = new ArrayList<>();
+    private final List<Integer> mOnBatteryIdList = new ArrayList<>();
 
-    private List<Integer> mChargingLimitList = new ArrayList<>();
-    private List<Integer> mChargingIdList = new ArrayList<>();
+    private final List<Integer> mChargingLimitList = new ArrayList<>();
+    private final List<Integer> mChargingIdList = new ArrayList<>();
 
     public BatteryItems(SharedPreferences sharedPreferences) {
         boolean error = false;

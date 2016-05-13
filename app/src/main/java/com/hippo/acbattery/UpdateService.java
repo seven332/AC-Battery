@@ -46,9 +46,9 @@ public class UpdateService extends IntentService {
     private static final int TEXT_SIZE_DP = 12;
     private static final int TEXT_OUTLINE_DP = 2;
 
-    private Paint mStrokePaint;
-    private Paint mTextPaint;
-    private Rect mRect;
+    private final Paint mStrokePaint;
+    private final Paint mTextPaint;
+    private final Rect mRect;
 
     private boolean mInitPaintSize = false;
 
