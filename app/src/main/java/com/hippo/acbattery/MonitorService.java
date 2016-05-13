@@ -17,13 +17,18 @@
 
 package com.hippo.acbattery;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.IBinder;
 
 public class MonitorService extends Service {
+
+    private static final int NOTIFY_ID = 123 << 16;
 
     private final BroadcastReceiver mMonitorReceiver = new MonitorReceiver();
 
@@ -35,6 +40,23 @@ public class MonitorService extends Service {
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
         intentFilter.addAction(Intent.ACTION_BATTERY_OKAY);
         registerReceiver(mMonitorReceiver, intentFilter);
+
+        startForeground();
+    }
+
+    private void startForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Context context = getApplicationContext();
+
+            Notification notify = new Notification.Builder(context).setContentTitle("Bully").build();
+            startForeground(NOTIFY_ID, notify);
+
+            Intent intent = new Intent(context, AbettorService.class);
+            intent.putExtra(AbettorService.KEY_NOTIFY_ID, NOTIFY_ID);
+            context.startService(intent);
+        } else {
+            startForeground(NOTIFY_ID, new Notification());
+        }
     }
 
     @Override

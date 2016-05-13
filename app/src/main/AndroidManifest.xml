@@ -73,6 +73,10 @@
             android:name="com.hippo.acbattery.UpdateService"
             android:exported="false"/>
 
+        <service
+            android:name="com.hippo.acbattery.AbettorService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
